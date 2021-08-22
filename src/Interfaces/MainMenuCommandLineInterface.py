@@ -1,10 +1,18 @@
+from src.User.User import User
+
+
 class RegisterMenuItem:
     def __init__(self):
         pass
 
+    def execute(self):
+        user = self._get_new_user_details()
+
     @staticmethod
-    def execute():
-        print("Register(WIP)")
+    def _get_new_user_details():
+        username = input("Please enter a username:").capitalize()
+        password = input("Please enter a password for your account:")
+        return User(username, password)
 
     @staticmethod
     def exit_initiated():
