@@ -1,4 +1,5 @@
 from src.User.User import User
+from src.HelperLibrary.Validator import Validator
 
 
 class RegisterMenuItem:
@@ -6,7 +7,8 @@ class RegisterMenuItem:
         pass
 
     def execute(self):
-        user = self._get_new_user_details()
+        if Validator("register").should_continue():
+            user = self._get_new_user_details()
 
     @staticmethod
     def _get_new_user_details():
@@ -25,7 +27,8 @@ class LoginMenuItem:
 
     @staticmethod
     def execute():
-        print("Login(WIP)")
+        if Validator("login").should_continue():
+            print("Login(WIP)")
 
     @staticmethod
     def exit_initiated():

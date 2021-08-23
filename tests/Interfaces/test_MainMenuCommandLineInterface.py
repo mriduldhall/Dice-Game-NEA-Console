@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 from src.User.User import User
-from src.Interfaces.MainMenuCommandLineInterface import RegisterMenuItem
+from src.Interfaces.MainMenuCommandLineInterface import CLI, RegisterMenuItem
 
 
 @pytest.mark.parametrize('username, password', (
@@ -15,3 +15,14 @@ def test_get_new_user_details(mock_object, username, password):
     assert isinstance(user, User)
     assert user.username == username.capitalize()
     assert user.password == password
+
+
+@pytest.mark.parametrize('inputs', (
+    ["i", "E"],
+    ["l", "0", "l", "1", "e"],
+    ["r", "1", "user", "mypass123", "e"]
+))
+@mock.patch('builtins.input')
+def test_CLI(mock_object, inputs):
+    mock_object.side_effect = inputs
+    CLI().initiate()
