@@ -7,7 +7,7 @@ from dotenv import load_dotenv, find_dotenv
 
 
 @pytest.fixture(scope='module')
-def resources(table_name="test"):
+def resources(table_name="storage_functions_test"):
     def database_reset():
         cursor.execute(
             """DELETE FROM """ + table_name
@@ -28,11 +28,11 @@ def resources(table_name="test"):
 
     load_dotenv(find_dotenv(".env-vars"))
     connection = psycopg2.connect(
-        database=os.getenv("test_name"),
-        user=os.getenv("test_user"),
-        password=os.getenv("test_password"),
-        host=os.getenv("test_host"),
-        port=os.getenv("test_port"),
+        database=os.getenv("name"),
+        user=os.getenv("user"),
+        password=os.getenv("password"),
+        host=os.getenv("host"),
+        port=os.getenv("port"),
     )
     connection.autocommit = True
     cursor = connection.cursor()
@@ -66,11 +66,11 @@ def storage_object(resources):
     load_dotenv(find_dotenv(".env-vars"))
     storage_object = StorageFunctions(
         table_name=table_name,
-        db_name=os.getenv("test_name"),
-        db_user=os.getenv("test_user"),
-        db_password=os.getenv("test_password"),
-        db_host=os.getenv("test_host"),
-        db_port=os.getenv("test_port"),
+        db_name=os.getenv("name"),
+        db_user=os.getenv("user"),
+        db_password=os.getenv("password"),
+        db_host=os.getenv("host"),
+        db_port=os.getenv("port"),
     )
     return storage_object
 
@@ -106,10 +106,10 @@ def test_retrieve(storage_object, column_list, data_list, negative, expected_res
 
 
 @pytest.mark.parametrize("column_list, data_list, identifier_value, identifier, test_query, expected_result", [
-    (["active"], [False], 1, "id", """SELECT * FROM test WHERE id = 1""", [(1, 'Joe', 'pass!', 39, False)]),
-    (["active"], [False], "James", "username", """SELECT * FROM test WHERE username = 'James'""", [(5, 'James', '1234', 28, False)]),
-    (["password", "age"], ["temp", 48], 2, "id", """SELECT * FROM test WHERE id = 2""", [(2, 'Tim', 'temp', 48, False)]),
-    (["active"], [True], False, "active", """SELECT * FROM test""", [(1, 'Joe', 'pass!', 39, True), (4, 'Smith', 'qwerty', 74, True), (5, 'James', '1234', 28, True), (2, 'Tim', 'test1ng', 47, True), (3, 'John', 'john', 18, True)])
+    (["active"], [False], 1, "id", """SELECT * FROM storage_functions_test WHERE id = 1""", [(1, 'Joe', 'pass!', 39, False)]),
+    (["active"], [False], "James", "username", """SELECT * FROM storage_functions_test WHERE username = 'James'""", [(5, 'James', '1234', 28, False)]),
+    (["password", "age"], ["temp", 48], 2, "id", """SELECT * FROM storage_functions_test WHERE id = 2""", [(2, 'Tim', 'temp', 48, False)]),
+    (["active"], [True], False, "active", """SELECT * FROM storage_functions_test""", [(1, 'Joe', 'pass!', 39, True), (4, 'Smith', 'qwerty', 74, True), (5, 'James', '1234', 28, True), (2, 'Tim', 'test1ng', 47, True), (3, 'John', 'john', 18, True)])
 ])
 def test_update(storage_object, column_list, data_list, identifier_value, identifier, test_query, expected_result):
     storage_object.update(column_list, data_list, identifier_value, identifier)
@@ -121,9 +121,9 @@ def test_update(storage_object, column_list, data_list, identifier_value, identi
 
 
 @pytest.mark.parametrize("data, identifier, test_query, expected_result", [
-    (1, "id", """SELECT * FROM test WHERE id = 1""", []),
-    ("Tim", "username", """SELECT * FROM test WHERE username = 'Tim'""", []),
-    (False, "active", """SELECT * FROM test WHERE active = False""", [])
+    (1, "id", """SELECT * FROM storage_functions_test WHERE id = 1""", []),
+    ("Tim", "username", """SELECT * FROM storage_functions_test WHERE username = 'Tim'""", []),
+    (False, "active", """SELECT * FROM storage_functions_test WHERE active = False""", [])
 ])
 def test_delete(storage_object, data, identifier, test_query, expected_result):
     storage_object.delete(data, identifier)

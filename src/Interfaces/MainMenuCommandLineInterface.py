@@ -1,4 +1,5 @@
 from src.User.User import User
+from src.User.Registration import Registration
 from src.HelperLibrary.Validator import Validator
 
 
@@ -9,6 +10,8 @@ class RegisterMenuItem:
     def execute(self):
         if Validator("register").should_continue():
             user = self._get_new_user_details()
+            message = Registration().register(user)
+            print(message)
 
     @staticmethod
     def _get_new_user_details():

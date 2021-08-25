@@ -1,16 +1,15 @@
 import os
 import pytest
 import psycopg2
-from unittest import mock
-from src.User.User import User
 from psycopg2 import OperationalError
 from dotenv import load_dotenv, find_dotenv
-from src.Interfaces.MainMenuCommandLineInterface import CLI, RegisterMenuItem
+from src.User.User import User
+from src.User.Registration import Registration, RegistrationStore
 
 
 @pytest.fixture(scope="module")
 def resources():
-    table_name = "users"
+    table_name = "testregistration"
     load_dotenv(find_dotenv(".env-vars"))
     connection = psycopg2.connect(
         database=os.getenv("name"),
@@ -66,26 +65,34 @@ def table(resources):
     return table_name
 
 
-@pytest.mark.parametrize('username, password', (
-    ["Mark", "P@ssword123!"],
-    ["tim", "mypass"],
+@pytest.mark.parametrize("inputs, expected_result", (
+        ("Joe", True),
+        ("John", False),
 ))
-@mock.patch('builtins.input')
-def test_get_new_user_details(mock_object, username, password):
-    mock_object.side_effect = [username, password]
-    user = RegisterMenuItem()._get_new_user_details()
-    assert isinstance(user, User)
-    assert user.username == username.capitalize()
-    assert user.password == password
+def test_check_if_user_exists(table, inputs, expected_result):
+    result = RegistrationStore(table).check_if_user_exists(inputs)
+    assert result == expected_result
 
 
-@pytest.mark.parametrize('inputs', (
-    ["i", "E"],
-    ["l", "0", "l", "1", "e"],
-    ["r", "1", "user", "mypass123", "e"],
-    ["r", "1", "Tim", "test1ng", "l", "1", "e"],
+@pytest.mark.parametrize("username, password, expected_result", (
+        ("John", "mypass123", [(4, 'John', 'mypass123')]),
 ))
-@mock.patch('builtins.input')
-def test_CLI(mock_object, inputs):
-    mock_object.side_effect = inputs
-    CLI().initiate()
+def test_add_user(resources, username, password, expected_result):
+    table, connection = resources
+    user = User(username, password)
+    RegistrationStore(table).add_user(user)
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM " + table + " WHERE username='" + str(username) + "'")
+    result = cursor.fetchall()
+    assert result == expected_result
+
+
+@pytest.mark.parametrize("username, password, expected_result", (
+        ("John", "mypass123", "You have successfully created an account with the username John"),
+        ("Smith", "mypass123", "Username is already taken"),
+        ("Tim", "mypass123", "Username is already taken"),
+))
+def test_register(table, username, password, expected_result):
+    user = User(username, password)
+    result = Registration(table).register(user)
+    assert result == expected_result
