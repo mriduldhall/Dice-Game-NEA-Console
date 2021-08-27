@@ -1,16 +1,15 @@
 import os
 import pytest
 import psycopg2
-from unittest import mock
-from src.User.User import User
 from psycopg2 import OperationalError
 from dotenv import load_dotenv, find_dotenv
-from src.Interfaces.MainMenuCommandLineInterface import CLI, RegisterMenuItem
+from src.User.User import User
+from src.User.Login import Login, LoginStore
 
 
 @pytest.fixture(scope="module")
 def resources():
-    table_name = "users"
+    table_name = "testlogin"
     load_dotenv(find_dotenv(".env-vars"))
     connection = psycopg2.connect(
         database=os.getenv("name"),
@@ -66,34 +65,23 @@ def table(resources):
     return table_name
 
 
-@pytest.mark.parametrize('username, password', (
-    ["Mark", "P@ssword123!"],
-    ["tim", "mypass"],
+@pytest.mark.parametrize("username, expected_result", (
+        ("Joe", True),
+        ("Smith", True),
+        ("User", False)
 ))
-@mock.patch('builtins.input')
-def test_get_new_user_details(mock_object, username, password):
-    mock_object.side_effect = [username, password]
-    user = RegisterMenuItem()._get_new_user_details()
-    assert isinstance(user, User)
-    assert user.username == username.capitalize()
-    assert user.password == password
+def test_get_user_by_username(table, username, expected_result):
+    user_result = LoginStore(table).get_user_by_username(username)
+    result = isinstance(user_result, User)
+    assert result == expected_result
 
 
-@pytest.mark.parametrize('inputs', (
-    # Information and capitalisation
-    ["i", "E"],
-    # Validator
-    ["l", "0", "l", "1", "user", "password", "0", "e"],
-    # Valid register
-    ["r", "1", "user", "mypass123", "e"],
-    # Login try again
-    ["l", "0", "l", "1", "User", "password", "0", "e"],
-    # Invalid register followed by valid login
-    ["r", "1", "tim", "test1ng", "l", "1", "Tim", "test1ng", "smith", "mypass123", "e"],
-    # Valid login and try again
-    ["l", "1", "joe", "mypass123", "Tim", "testing", "1", "Tim", "test1ng", "e"]
+@pytest.mark.parametrize("username, password, expected_result", (
+        ("Joe", "mypass123", True),
+        ("Smith", "mypass124", False),
+        ("User", "password", False)
 ))
-@mock.patch('builtins.input')
-def test_CLI(mock_object, inputs):
-    mock_object.side_effect = inputs
-    CLI().initiate()
+def test_login(table, username, password, expected_result):
+    user = User(username, password)
+    result = Login(table).login(user)
+    assert result == expected_result

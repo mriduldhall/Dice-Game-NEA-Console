@@ -1,4 +1,5 @@
 from src.User.User import User
+from src.User.Login import Login
 from src.User.Registration import Registration
 from src.HelperLibrary.Validator import Validator
 
@@ -31,7 +32,33 @@ class LoginMenuItem:
     @staticmethod
     def execute():
         if Validator("login").should_continue():
-            print("Login(WIP)")
+            logged_in = False
+            try_again = True
+            logged_in_usernames = []
+            while (logged_in is False) and (try_again is True):
+                username = input("Enter your username:").capitalize()
+                password = input("Enter your password:")
+                login_result = Login().login(User(username, password))
+                if not login_result:
+                    print("Incorrect username and/or password")
+                    invalid_input = True
+                    while invalid_input:
+                        try:
+                            try_again = bool(int(input("Would you like to try again? Enter 1 to try again and 0 to exit.")))
+                        except ValueError:
+                            print("Please enter either 0 or 1")
+                        else:
+                            invalid_input = False
+                else:
+                    if len(logged_in_usernames) == 1:
+                        print("Both players successfully logged in!")
+                        logged_in = True
+                        try_again = False
+                    else:
+                        print("Player 1 successfully logged in!")
+                    logged_in_usernames.append(username)
+            if len(logged_in_usernames) == 2:
+                print("Game Menu(WIP)")
 
     @staticmethod
     def exit_initiated():
