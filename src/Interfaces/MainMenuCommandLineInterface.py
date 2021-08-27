@@ -3,6 +3,7 @@ from src.User.Login import Login
 from src.User.Registration import Registration
 from src.HelperLibrary.Validator import Validator
 from src.HelperLibrary.Singleton import Singleton
+from src.Interfaces.GameMenuCommandLineInterface import CLI as GameCLI
 
 
 class RegisterMenuItem:
@@ -60,7 +61,7 @@ class LoginMenuItem:
                     logged_in_usernames.append(username)
             if len(logged_in_usernames) == 2:
                 singleton = Singleton(*logged_in_usernames)
-                print("Game Menu(WIP)")
+                GameCLI(singleton).initiate()
                 Singleton.reset()
 
     @staticmethod

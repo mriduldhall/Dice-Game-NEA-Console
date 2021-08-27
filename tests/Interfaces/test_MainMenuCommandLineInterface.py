@@ -5,7 +5,13 @@ from unittest import mock
 from src.User.User import User
 from psycopg2 import OperationalError
 from dotenv import load_dotenv, find_dotenv
+from src.HelperLibrary.Singleton import Singleton
 from src.Interfaces.MainMenuCommandLineInterface import CLI, RegisterMenuItem
+
+
+@pytest.fixture(autouse=True)
+def reset():
+    Singleton.reset()
 
 
 @pytest.fixture(scope="module")
@@ -89,9 +95,9 @@ def test_get_new_user_details(mock_object, username, password):
     # Login try again
     ["l", "0", "l", "1", "User", "password", "0", "e"],
     # Invalid register followed by valid login
-    ["r", "1", "tim", "test1ng", "l", "1", "Tim", "test1ng", "smith", "mypass123", "e"],
+    ["r", "1", "tim", "test1ng", "l", "1", "Tim", "test1ng", "smith", "mypass123", "e", "e"],
     # Valid login and try again
-    ["l", "1", "joe", "mypass123", "Tim", "testing", "1", "Tim", "test1ng", "e"]
+    ["l", "1", "joe", "mypass123", "Tim", "testing", "1", "Tim", "test1ng", "e", "e"]
 ))
 @mock.patch('builtins.input')
 def test_CLI(mock_object, inputs):
