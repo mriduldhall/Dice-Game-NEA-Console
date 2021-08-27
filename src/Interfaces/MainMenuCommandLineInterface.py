@@ -2,6 +2,7 @@ from src.User.User import User
 from src.User.Login import Login
 from src.User.Registration import Registration
 from src.HelperLibrary.Validator import Validator
+from src.HelperLibrary.Singleton import Singleton
 
 
 class RegisterMenuItem:
@@ -58,7 +59,9 @@ class LoginMenuItem:
                         print("Player 1 successfully logged in!")
                     logged_in_usernames.append(username)
             if len(logged_in_usernames) == 2:
+                singleton = Singleton(*logged_in_usernames)
                 print("Game Menu(WIP)")
+                Singleton.reset()
 
     @staticmethod
     def exit_initiated():
