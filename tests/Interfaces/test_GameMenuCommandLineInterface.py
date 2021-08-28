@@ -10,10 +10,8 @@ def reset():
 
 
 @pytest.mark.parametrize('inputs', (
-    # Information and capitalisation
+    # Leaderboard and capitalisation
     ["l", "E"],
-    # Game
-    ["g", "e"],
 ))
 @mock.patch('builtins.input')
 def test_CLI(mock_object, inputs):

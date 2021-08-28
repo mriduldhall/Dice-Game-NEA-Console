@@ -1,10 +1,13 @@
-class GameMenuItem:
-    def __init__(self):
-        pass
+from src.HelperLibrary.Game import Game
 
-    @staticmethod
-    def execute():
-        print("Game(WIP)")
+
+class GameMenuItem:
+    def __init__(self, singleton):
+        self.player_one_username = singleton.player_one
+        self.player_two_username = singleton.player_two
+
+    def execute(self):
+        Game(self.player_one_username, self.player_two_username).play()
 
     @staticmethod
     def exit_initiated():
@@ -39,7 +42,7 @@ class LogoutMenuItem:
 class CLI:
     def __init__(self, singleton):
         self.main_menu_dict = {
-            'g': GameMenuItem(),
+            'g': GameMenuItem(singleton),
             'l': LeaderboardMenuItem(),
             'e': LogoutMenuItem(),
         }
