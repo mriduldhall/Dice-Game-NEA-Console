@@ -1,5 +1,6 @@
 from random import randint
 from time import sleep
+from src.HelperLibrary.StorageFunctions import StorageFunctions
 
 
 class Game:
@@ -65,6 +66,17 @@ class Game:
     def play(self):
         for round_number in range(self.rounds):
             self.play_round(round_number + 1)
-        print(self.get_winner(), "is the winner!!!!!!!!")
+        winner = self.get_winner()
+        print(winner, "is the winner!!!!!!!!")
+        self.save(winner)
         print("Thank you for playing the game")
         print("---Rolling you back to menu---")
+
+    def save(self, winner, table_name="games", user_table_name="users"):
+        player_one_id = StorageFunctions(user_table_name).retrieve(["username"], [self.player_one])[0][0]
+        player_two_id = StorageFunctions(user_table_name).retrieve(["username"], [self.player_two])[0][0]
+        winner = player_one_id if winner == self.player_one else player_two_id
+        StorageFunctions(table_name).append(
+            "(player_one_id, player_two_id, player_one_score, player_two_score, winner)",
+            [player_one_id, player_two_id, self.player_one_score, self.player_two_score, winner]
+        )
