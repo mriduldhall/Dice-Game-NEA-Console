@@ -26,7 +26,7 @@ Design, develop, test and evaluate a program that:
 6. Stores the winner’s score, and their name, in an external file
 7. Displays the score and player name of the top 5 winning scores from the external file
 
-##Usage
+## Usage
 1. Clone this repository using: https://github.com/mriduldhall/Dice-Game-NEA-Console.git
 2. Open a command line session and navigate to cloned folder
 3. Install requirements using: `pip install -r requirements.txt`
@@ -40,5 +40,5 @@ Design, develop, test and evaluate a program that:
 6. Use `python -m pytest -v` to run unit tests to ensure the game is working
 7. Run `src/Main.py` to run game
 
-##License
+## License
 [MIT License](https://github.com/mriduldhall/Dice-Game-NEA-Console/blob/main/LICENSE)
