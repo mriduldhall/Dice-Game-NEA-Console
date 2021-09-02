@@ -75,7 +75,8 @@ class InformationMenuItem:
 
     @staticmethod
     def execute():
-        print("No information available")
+        print("The OCR NEA Task Dice Game is a game developed for the GCSE NEA task.\n"
+              "Github: https://github.com/mriduldhall/Dice-Game-NEA-Console")
 
     @staticmethod
     def exit_initiated():
