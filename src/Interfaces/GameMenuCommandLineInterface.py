@@ -1,4 +1,5 @@
 from src.HelperLibrary.Game import Game
+from src.HelperLibrary.Leaderboard import Leaderboard
 
 
 class GameMenuItem:
@@ -20,7 +21,11 @@ class LeaderboardMenuItem:
 
     @staticmethod
     def execute():
-        print("Leaderboard(WIP)")
+        high_scores = Leaderboard().get_records()
+        high_scores = Leaderboard().format_records(high_scores)
+        print("Leaderboard-")
+        for high_score in high_scores:
+            print(high_score[0] + ": " + str(high_score[1]))
 
     @staticmethod
     def exit_initiated():

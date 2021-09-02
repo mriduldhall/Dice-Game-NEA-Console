@@ -1,17 +1,15 @@
 import os
 import pytest
 import psycopg2
-from unittest import mock
 from psycopg2 import OperationalError
 from dotenv import load_dotenv, find_dotenv
-from src.HelperLibrary.Singleton import Singleton
-from src.Interfaces.GameMenuCommandLineInterface import CLI
+from src.HelperLibrary.Leaderboard import Leaderboard
 
 
 @pytest.fixture(scope='module')
 def resources():
-    users_table_name = "users"
-    games_table_name = "games"
+    users_table_name = "testusers"
+    games_table_name = "testgames"
     load_dotenv(find_dotenv(".env-vars"))
     connection = psycopg2.connect(
         database=os.getenv("name"),
@@ -25,8 +23,8 @@ def resources():
     try:
         cursor.execute(
             """CREATE TABLE IF NOT EXISTS """ + users_table_name + """ (
-            id SERIAL PRIMARY KEY,
-            username TEXT NOT NULL,
+            id SERIAL PRIMARY KEY, 
+            username TEXT NOT NULL, 
             password TEXT NOT NULL
             )"""
         )
@@ -56,7 +54,7 @@ def resources():
         print("The error", error, "occurred")
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def tables(resources):
     users_table_name, games_table_name, connection = resources
     connection.autocommit = True
@@ -74,27 +72,35 @@ def tables(resources):
             (3, "Smith", "mypass123")
         ]
         user_records = ", ".join(["%s"] * len(users))
+        games = [
+            (1, 1, 2, 58, 29, 1),
+            (2, 1, 2, 61, 56, 1),
+            (3, 1, 2, 57, 63, 2),
+            (4, 3, 2, 73, 94, 2),
+            (5, 3, 2, 58, 55, 3),
+            (6, 3, 1, 46, 63, 1),
+            (7, 2, 1, 65, 91, 1),
+            (8, 1, 3, 37, 82, 3),
+            (9, 2, 3, 54, 47, 2),
+            (10, 3, 2, 82, 58, 3)
+        ]
+        game_records = ", ".join(["%s"] * len(games))
         cursor.execute(
             f"INSERT INTO " + users_table_name + f"(id, username, password) VALUES {user_records}",
             users
         )
+        cursor.execute(
+            f"INSERT INTO " + games_table_name + f"(id, player_one_id, player_two_id, player_one_score, player_two_score, winner) VALUES {game_records}",
+            games
+        )
         cursor.execute("ALTER SEQUENCE " + users_table_name + "_id_seq RESTART WITH " + str(len(users)+1))
-        cursor.execute("ALTER SEQUENCE " + games_table_name + "_id_seq RESTART WITH 1")
+        cursor.execute("ALTER SEQUENCE " + games_table_name + "_id_seq RESTART WITH " + str(len(games)+1))
     except OperationalError as error:
         print("The error", error, "occurred")
     return users_table_name, games_table_name
 
 
-@pytest.fixture(autouse=True)
-def reset():
-    Singleton.reset()
-
-
-@pytest.mark.parametrize('inputs', (
-    # Leaderboard and capitalisation
-    ["l", "E"],
-))
-@mock.patch('builtins.input')
-def test_CLI(mock_object, tables, inputs):
-    mock_object.side_effect = inputs
-    CLI(Singleton("", "")).initiate()
+def test_get_players(tables):
+    users_table, games_table = tables
+    records = Leaderboard(users_table, games_table).get_records()
+    assert records == [[2, 94], [1, 91], [3, 82], [3, 82], [2, 63]]
